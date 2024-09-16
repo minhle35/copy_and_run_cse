@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # always copy as a directory
+# set up SSH key to access into zXXXXXXX@login.cse.unsw.edu.au in advance
+# functionality to run an independent file is not complete
 copy_and_run(){
     local program="$1"
     local command="$2"
