@@ -1,8 +1,4 @@
 #!/bin/bash
-
-# always copy as a directory
-# set up SSH key to access into zXXXXXXX@login.cse.unsw.edu.au in advance
-# functionality to run an independent file is not complete
 copy_and_run(){
     local program="$1"
     local command="$2"
@@ -22,11 +18,8 @@ copy_and_run(){
     if [ -d "$program" ]; then
         echo "$program is a directory, copying recursively."
         scp -r "$program" "$remote_user:$remote_path"
-    elif [ -f "$program" ];then
-        echo "$item is a file, copying."
-        scp "$item" "$remote_user:$remote_path"
     else
-        echo "$item is neither a file nor a directory. Exiting."
+        echo "$program is not a directory. Exiting."
         return 1
     fi
     # Check if the copy was successful
@@ -34,13 +27,20 @@ copy_and_run(){
         echo "Copy successful."
 
         # Connect to the remote server and run the provided command
-        ssh "$remote_user" "cd $remote_path && 6991 autotest"
+        ssh "$remote_user" "cd $remote_path && $command"
+
+        read -p "Do you want to submit? (Type 'No' to exit, otherwise provide the next  command, for exampele 6991 give-crate): " submit
+
+        if [ "$submit" != "No" ];then
+            ssh "$remote_user" "cd $remote_path && $submit"
+        else
+            return 0
+        fi
+
     else
         echo "Failed to run command $command."
     fi
 }
-
-
 
 read -p "Enter the directory to copy: " program
 read -p "Enter the command to run after copying: " command
